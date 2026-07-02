@@ -8,7 +8,7 @@
 
 ---
 
-## 📌 Project Overview
+## 📌 Project Overview 
 
 This project demonstrates an end-to-end **fraud detection system** built entirely in SQL. Starting from database design through to analytical reporting, it identifies fraudulent financial transactions using anomaly detection, risk scoring, behavioral signals, and real-time monitoring patterns.
 
