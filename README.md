@@ -121,10 +121,10 @@ The project includes a standalone HTML dashboard that visualizes all SQL query r
 - Device mismatch × login attempts compound signal (grouped bar)
 - KPI metric cards for instant overview
 
-> Open `fraud-detection-2dd594.netlify.app` directly in any browser — no server needed.
+
 ![github_link](https://github.com/faridah-portfolio/fraud-detection/blob/242d8628317909f420eaba5d9780301b100e75c5/farida_fraud%20detection.sql)
 
-![github link](fraud-detection-2dd594.netlify.app)
+
 
 ## 👩🏾‍💻 Author
 
