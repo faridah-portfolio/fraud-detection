@@ -122,31 +122,9 @@ The project includes a standalone HTML dashboard that visualizes all SQL query r
 - KPI metric cards for instant overview
 
 > Open `fraud-detection-2dd594.netlify.app` directly in any browser — no server needed.
+![github_link](https://github.com/faridah-portfolio/fraud-detection/blob/242d8628317909f420eaba5d9780301b100e75c5/farida_fraud%20detection.sql)
 
----
-
-
-## 🚀 How to Run
-
-**SQL Analysis**
-1. Open MySQL Workbench or any MySQL-compatible client
-2. Run the full `fraud_detection_queries.sql` file top to bottom
-3. The script will:
-   - Create the database and all 5 tables
-   - Insert sample data
-   - Execute all 12 analysis queries
-
-```sql
--- Quick start
-SOURCE fraud_detection_queries.sql;
-```
-
-**HTML Dashboard**
-1. Download `fraud_detection_dashboard.html`
-2. Open it in any browser (Chrome, Firefox, Edge)
-3. No installation or server required
-
----
+![github link](fraud-detection-2dd594.netlify.app)
 
 ## 👩🏾‍💻 Author
 
@@ -158,4 +136,4 @@ Data Analyst | Power BI Developer | SQL & Python
 
 ---
 
-*Part of a growing data analytics portfolio spanning SQL, Power BI, Python, and Excel.*
+
