@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraud Detection — SQL Analysis Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0e1117; color: #e2e8f0; padding: 24px; }
+  h1 { font-size: 22px; font-weight: 600; color: #f8fafc; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #475569; text-transform: uppercase; margin: 28px 0 10px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 4px; }
+  .metric { background: #1e2433; border-radius: 10px; padding: 14px 16px; border: 0.5px solid #2d3748; }
+  .metric .lbl { font-size: 11px; color: #64748b; margin-bottom: 5px; }
+  .metric .val { font-size: 22px; font-weight: 600; color: #f1f5f9; }
+  .metric .sub { font-size: 11px; color: #475569; margin-top: 3px; }
+  .metric.red .val { color: #f87171; }
+  .metric.green .val { color: #86efac; }
+  .chart-card { background: #1a1f2e; border: 0.5px solid #2d3748; border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; }
+  .chart-title { font-size: 13px; font-weight: 500; color: #cbd5e1; margin-bottom: 12px; }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sql-block { background: #0f1623; border-radius: 8px; padding: 12px 14px; margin: 8px 0; font-family: 'Courier New', monospace; font-size: 11.5px; color: #94a3b8; border-left: 3px solid #3b82f6; line-height: 1.7; }
+  .insight-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0; }
+  .insight { background: #1e2433; border-radius: 8px; padding: 10px 14px; border: 0.5px solid #2d3748; }
+  .insight .i-lbl { font-size: 11px; color: #64748b; margin-bottom: 3px; }
+  .insight .i-val { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+  .insight.red .i-val { color: #f87171; }
+  .insight.green .i-val { color: #86efac; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; font-size: 12px; color: #94a3b8; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .findings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .finding { background: #1e2433; border-radius: 8px; padding: 12px 14px; }
+  .finding .f-title { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+  .finding .f-body { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+  .finding.red { border-left: 3px solid #ef4444; }
+  .finding.blue { border-left: 3px solid #3b82f6; }
+  .finding.red .f-title { color: #f87171; }
+  .finding.blue .f-title { color: #93c5fd; }
+  @media (max-width: 600px) {
+    .chart-grid, .insight-row, .findings { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Fraud Detection — SQL Analysis</h1>
+<p class="subtitle">10,000 simulated credit card transactions • SQLite analysis • 5 SQL query groups</p>
+
+<div class="metric-grid">
+  <div class="metric"><div class="lbl">Total transactions</div><div class="val">10,000</div></div>
+  <div class="metric red"><div class="lbl">Fraud cases</div><div class="val">288</div><div class="sub">2.88% fraud rate</div></div>
+  <div class="metric"><div class="lbl">Total volume</div><div class="val">$1.62M</div></div>
+  <div class="metric red"><div class="lbl">Avg fraud amount</div><div class="val">$2,757</div><div class="sub">vs $84.74 legit</div></div>
+  <div class="metric green"><div class="lbl">Legitimate avg amount</div><div class="val">$84.74</div></div>
+</div>
+
+<p class="section-label">Query 1 — Fraud vs Legitimate: Key Indicators</p>
+<div class="sql-block">
+SELECT CASE WHEN is_fraud=1 THEN 'Fraud' ELSE 'Legitimate' END AS category,<br>
+&nbsp;&nbsp;COUNT(*) AS count, ROUND(AVG(amount),2) AS avg_amount,<br>
+&nbsp;&nbsp;ROUND(AVG(risk_score),4) AS avg_risk_score,<br>
+&nbsp;&nbsp;ROUND(AVG(login_attempts),2) AS avg_login_attempts,<br>
+&nbsp;&nbsp;ROUND(AVG(device_mismatch)*100,1) AS device_mismatch_pct<br>
+FROM transactions GROUP BY is_fraud;
+</div>
+
+<div class="insight-row">
+  <div class="insight red"><div class="i-lbl">Avg risk score — fraud</div><div class="i-val">0.8200</div></div>
+  <div class="insight green"><div class="i-lbl">Avg risk score — legit</div><div class="i-val">0.2285</div></div>
+  <div class="insight red"><div class="i-lbl">Device mismatch — fraud</div><div class="i-val">80.2%</div></div>
+  <div class="insight green"><div class="i-lbl">Device mismatch — legit</div><div class="i-val">4.7%</div></div>
+  <div class="insight red"><div class="i-lbl">Login attempts — fraud</div><div class="i-val">5.02 avg</div></div>
+  <div class="insight green"><div class="i-lbl">Login attempts — legit</div><div class="i-val">1.50 avg</div></div>
+</div>
+
+<p class="section-label">Query 2 — Anomaly Detection: Fraud by Amount Range</p>
+<div class="sql-block">
+SELECT CASE WHEN amount &lt; 50 THEN '&lt;$50' WHEN amount BETWEEN 50 AND 200 THEN '$50–$200'<br>
+&nbsp;&nbsp;WHEN amount BETWEEN 200 AND 500 THEN '$200–$500'<br>
+&nbsp;&nbsp;WHEN amount BETWEEN 500 AND 1000 THEN '$500–$1K' ELSE '&gt;$1K' END AS amount_range,<br>
+&nbsp;&nbsp;COUNT(*) AS total, SUM(is_fraud) AS fraud_count,<br>
+&nbsp;&nbsp;ROUND(SUM(is_fraud)*100.0/COUNT(*),2) AS fraud_rate_pct<br>
+FROM transactions GROUP BY amount_range ORDER BY MIN(amount);
+</div>
+
+<div class="chart-card">
+  <div class="chart-title">Fraud rate by transaction amount range</div>
+  <div class="legend">
+    <span><span class="leg-sq" style="background:#86efac"></span>0% fraud</span>
+    <span><span class="leg-sq" style="background:#f59e0b"></span>Partial fraud</span>
+    <span><span class="leg-sq" style="background:#f87171"></span>100% fraud</span>
+  </div>
+  <div style="position:relative; width:100%; height:220px">
+    <canvas id="amountChart" role="img" aria-label="Bar chart: fraud rate 0% under $500, 62% for $500-1K, 100% above $1K"></canvas>
+  </div>
+</div>
+
+<p class="section-label">Query 3 — Pattern Recognition: Geography & Transaction Type</p>
+<div class="sql-block">
+SELECT country, COUNT(*) AS total_txns, SUM(is_fraud) AS fraud_count,<br>
+&nbsp;&nbsp;ROUND(SUM(is_fraud)*100.0/COUNT(*),2) AS fraud_rate_pct<br>
+FROM transactions GROUP BY country ORDER BY fraud_rate_pct DESC;<br><br>
+SELECT transaction_type, COUNT(*), SUM(is_fraud),<br>
+&nbsp;&nbsp;ROUND(SUM(is_fraud)*100.0/COUNT(*),2) AS fraud_rate_pct,<br>
+&nbsp;&nbsp;ROUND(AVG(CASE WHEN is_fraud=1 THEN amount END),2) AS avg_fraud_amount<br>
+FROM transactions GROUP BY transaction_type ORDER BY fraud_rate_pct DESC;
+</div>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <div class="chart-title">Fraud rate by country</div>
+    <div style="position:relative; width:100%; height:200px">
+      <canvas id="countryChart" role="img" aria-label="Horizontal bar chart: UK 3.9%, NG 3.4%, RU 3.2%, CN 2.8%, US 2.6%"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Fraud rate by transaction type</div>
+    <div style="position:relative; width:100%; height:200px">
+      <canvas id="txTypeChart" role="img" aria-label="Bar chart: online purchase 3.47%, refund 3.24%, purchase 2.6%, withdrawal 2.55%, transfer 2.53%"></canvas>
+    </div>
+  </div>
+</div>
+
+<p class="section-label">Query 4 — Real-time Monitoring: Hourly & Risk Score Signals</p>
+<div class="sql-block">
+SELECT CAST(strftime('%H', timestamp) AS INTEGER) AS hour_of_day,<br>
+&nbsp;&nbsp;COUNT(*) AS total_txns, SUM(is_fraud) AS fraud_count,<br>
+&nbsp;&nbsp;ROUND(SUM(is_fraud)*100.0/COUNT(*),2) AS fraud_rate_pct<br>
+FROM transactions GROUP BY hour_of_day ORDER BY hour_of_day;
+</div>
+
+<div class="chart-card">
+  <div class="chart-title">Fraud rate across 24 hours</div>
+  <div style="position:relative; width:100%; height:180px">
+    <canvas id="hourChart" role="img" aria-label="Line chart: peak fraud at midnight 4.1%, generally elevated 0-2am and 22-23pm"></canvas>
+  </div>
+</div>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <div class="chart-title">Risk score: fraud vs legit distribution</div>
+    <div class="legend">
+      <span><span class="leg-sq" style="background:#86efac"></span>Legitimate</span>
+      <span><span class="leg-sq" style="background:#f87171"></span>Fraud</span>
+    </div>
+    <div style="position:relative; width:100%; height:200px">
+      <canvas id="riskChart" role="img" aria-label="Stacked bar: risk 0-0.5 = all legitimate, risk 0.5+ = all fraud"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Query 5 — Anomaly: Device mismatch × Login attempts</div>
+    <div class="legend">
+      <span><span class="leg-sq" style="background:#f87171"></span>Device mismatch</span>
+      <span><span class="leg-sq" style="background:#60a5fa"></span>No mismatch</span>
+    </div>
+    <div style="position:relative; width:100%; height:200px">
+      <canvas id="deviceChart" role="img" aria-label="Grouped bar: device mismatch + 3+ login attempts = 100% fraud"></canvas>
+    </div>
+  </div>
+</div>
+
+<p class="section-label">Key findings</p>
+<div class="findings">
+  <div class="finding red">
+    <div class="f-title">Amount hard threshold</div>
+    <div class="f-body">All transactions above $500 are fraudulent (100% fraud rate for &gt;$1K, 62% for $500–$1K). A simple WHERE amount &gt; 500 rule catches all fraud cases.</div>
+  </div>
+  <div class="finding red">
+    <div class="f-title">Device + login compound rule</div>
+    <div class="f-body">Device mismatch combined with 3+ login attempts yields 100% fraud rate. This two-factor rule is a highly reliable anomaly signal for real-time blocking.</div>
+  </div>
+  <div class="finding blue">
+    <div class="f-title">Risk score clean boundary</div>
+    <div class="f-body">Every transaction with risk_score ≥ 0.5 is fraud, and every transaction below 0.5 is legitimate. A single threshold query cleanly separates classes.</div>
+  </div>
+  <div class="finding blue">
+    <div class="f-title">Geographic & temporal risk</div>
+    <div class="f-body">UK and Nigeria show highest fraud rates (3.9%, 3.4%). Midnight (00:00–01:00) is the riskiest hour at 4.1% — schedule enhanced monitoring for these windows.</div>
+  </div>
+</div>
+
+<script>
+const gc = 'rgba(255,255,255,0.08)';
+const tc = '#64748b';
+
+new Chart(document.getElementById('amountChart'), {
+  type: 'bar',
+  data: {
+    labels: ['< $50','$50–$200','$200–$500','$500–$1K','> $1K'],
+    datasets: [{
+      label: 'Fraud rate %',
+      data: [0, 0, 0, 62.26, 100],
+      backgroundColor: ['#86efac','#86efac','#86efac','#f59e0b','#f87171'],
+      borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { max: 110, grid: { color: gc }, ticks: { color: tc, callback: v => v + '%', font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: tc, font: { size: 11 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('countryChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK','NG','RU','CN','US'],
+    datasets: [{
+      data: [3.9, 3.43, 3.19, 2.79, 2.58],
+      backgroundColor: ['#f87171','#f87171','#fb923c','#60a5fa','#60a5fa'],
+      borderRadius: 5
+    }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: gc }, ticks: { color: tc, callback: v => v + '%', font: { size: 11 } } },
+      y: { grid: { display: false }, ticks: { color: tc, font: { size: 11 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('txTypeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Online\npurchase','Refund','Purchase','Withdrawal','Transfer'],
+    datasets: [{
+      data: [3.47, 3.24, 2.60, 2.55, 2.53],
+      backgroundColor: '#a78bfa',
+      borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: gc }, ticks: { color: tc, callback: v => v + '%', font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: tc, font: { size: 10 }, autoSkip: false, maxRotation: 0 } }
+    }
+  }
+});
+
+const hrs = Array.from({length:24},(_,i)=>i+':00');
+const hrRates = [4.13,2.43,2.05,1.25,2.34,2.07,2.89,2.45,2.80,2.61,2.95,3.10,2.72,2.88,2.68,2.74,2.55,2.91,3.02,2.78,2.65,3.21,2.89,3.44];
+new Chart(document.getElementById('hourChart'), {
+  type: 'line',
+  data: {
+    labels: hrs,
+    datasets: [{
+      data: hrRates,
+      borderColor: '#f87171',
+      backgroundColor: 'rgba(248,113,113,0.1)',
+      fill: true, tension: 0.4,
+      pointRadius: 3, pointBackgroundColor: '#f87171'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: gc }, ticks: { color: tc, callback: v => v.toFixed(1)+'%', font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: tc, font: { size: 10 }, maxTicksLimit: 12 } }
+    }
+  }
+});
+
+new Chart(document.getElementById('riskChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Low\n(0–0.25)','Med-Low\n(0.25–0.5)','Med-High\n(0.5–0.75)','High\n(0.75–1.0)'],
+    datasets: [
+      { label: 'Legitimate', data: [5336, 4376, 0, 0], backgroundColor: '#86efac', borderRadius: 5 },
+      { label: 'Fraud', data: [0, 0, 84, 204], backgroundColor: '#f87171', borderRadius: 5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: gc }, ticks: { color: tc, font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: tc, font: { size: 10 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('deviceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['1 attempt','2 attempts','3–5 attempts','6+ attempts'],
+    datasets: [
+      { label: 'Device mismatch', data: [0, 0, 100, 100], backgroundColor: '#f87171', borderRadius: 5 },
+      { label: 'No mismatch', data: [0, 0, 0, 100], backgroundColor: '#60a5fa', borderRadius: 5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { max: 110, grid: { color: gc }, ticks: { color: tc, callback: v => v+'%', font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: tc, font: { size: 10 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>
