@@ -1,16 +1,8 @@
 
--- STEP 1: CREATE DATABASE
--- ============================================================
 
 CREATE DATABASE fraud_detection_db;
 USE fraud_detection_db;
 
-
--- ============================================================
--- STEP 2: CREATE TABLES
--- ============================================================
-
--- Table 1: Users
 CREATE TABLE users (
     user_id       VARCHAR(10)  PRIMARY KEY,
     full_name     VARCHAR(100) NOT NULL,
@@ -20,7 +12,6 @@ CREATE TABLE users (
     created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP
 );
 
--- Table 2: Merchants
 CREATE TABLE merchants (
     merchant_id   VARCHAR(10)  PRIMARY KEY,
     merchant_name VARCHAR(100) NOT NULL,
@@ -28,7 +19,7 @@ CREATE TABLE merchants (
     country       VARCHAR(50)
 );
 
--- Table 3: Transactions (main fact table)
+
 CREATE TABLE transactions (
     transaction_id   VARCHAR(12)    PRIMARY KEY,
     user_id          VARCHAR(10)    NOT NULL,
@@ -43,7 +34,7 @@ CREATE TABLE transactions (
     FOREIGN KEY (merchant_id) REFERENCES merchants(merchant_id)
 );
 
--- Table 4: Fraud Signals (behavioral features per transaction)
+
 CREATE TABLE fraud_signals (
     signal_id        INT           PRIMARY KEY AUTO_INCREMENT,
     transaction_id   VARCHAR(12)   NOT NULL,
@@ -55,7 +46,7 @@ CREATE TABLE fraud_signals (
     FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id)
 );
 
--- Table 5: Fraud Alerts (cases flagged for review)
+
 CREATE TABLE fraud_alerts (
     alert_id         INT          PRIMARY KEY AUTO_INCREMENT,
     transaction_id   VARCHAR(12)  NOT NULL,
@@ -68,11 +59,6 @@ CREATE TABLE fraud_alerts (
 );
 
 
--- ============================================================
--- STEP 3: INSERT SAMPLE DATA
--- ============================================================
-
--- Insert Users
 INSERT INTO users (user_id, full_name, email, country, account_type) VALUES
 ('USR0001', 'Amara Okafor',    'amara.o@email.com',   'Nigeria', 'personal'),
 ('USR0002', 'James Carter',    'j.carter@email.com',  'US',      'premium'),
@@ -85,7 +71,7 @@ INSERT INTO users (user_id, full_name, email, country, account_type) VALUES
 ('USR0009', 'Emma Thompson',   'emma.t@email.com',    'UK',      'premium'),
 ('USR0010', 'Alexei Volkov',   'alexei.v@email.com',  'Russia',  'personal');
 
--- Insert Merchants
+
 INSERT INTO merchants (merchant_id, merchant_name, category, country) VALUES
 ('MER001', 'Amazon',           'E-Commerce',    'US'),
 ('MER002', 'Walmart',          'Retail',        'US'),
@@ -98,7 +84,7 @@ INSERT INTO merchants (merchant_id, merchant_name, category, country) VALUES
 ('MER009', 'Target',           'Retail',        'US'),
 ('MER010', 'McDonalds',        'Food',          'US');
 
--- Insert Transactions
+
 INSERT INTO transactions (transaction_id, user_id, merchant_id, transaction_type, amount, country, transaction_time, is_fraud) VALUES
 ('TXN000001', 'USR0001', 'MER001', 'online_purchase', 45.99,   'Nigeria', '2024-01-03 14:22:00', 0),
 ('TXN000002', 'USR0002', 'MER002', 'purchase',         120.50,  'US',      '2024-01-05 09:10:00', 0),
@@ -132,9 +118,7 @@ INSERT INTO fraud_alerts (transaction_id, alert_type, alert_reason, severity, st
 ('TXN000010', 'ip_anomaly',     'IP country does not match registered country',           'high',     'open');
 
 
--- ============================================================
--- STEP 4: ANALYSIS QUERIES
--- ============================================================
+
 
 -- ------------------------------------------------------------
 -- A. OVERVIEW — Dataset summary
