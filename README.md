@@ -121,21 +121,10 @@ The project includes a standalone HTML dashboard that visualizes all SQL query r
 - Device mismatch × login attempts compound signal (grouped bar)
 - KPI metric cards for instant overview
 
-> Open `fraud_detection_dashboard.html` directly in any browser — no server needed.
+> Open `fraud-detection-2dd594.netlify.app` directly in any browser — no server needed.
 
 ---
 
-## 📁 File Structure
-
-```
-fraud-detection-sql/
-│
-├── fraud_detection_queries.sql        # All queries: schema → inserts → analysis
-├── fraud_detection_dashboard.html     # Interactive HTML visualization
-└── README.md
-```
-
----
 
 ## 🚀 How to Run
 
